@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To My Favorite Chaotic Star</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Whimsical Serif & Modern Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;500;700&family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #040209;
+            overflow: hidden;
+        }
+        .whimsical-font {
+            font-family: 'Fredoka', sans-serif;
+        }
+        /* Custom neon glowing elements */
+        .bubble-glow {
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.1), inset 0 0 15px rgba(56, 189, 248, 0.05);
+        }
+        /* Ultra-transparent premium glassmorphism with enhanced blur */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        /* Playful slow float */
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(1.5deg); }
+        }
+        .playful-float {
+            animation: float-slow 4s ease-in-out infinite;
+        }
+        /* Shake animation for password rejection */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .shake-active {
+            animation: shake 0.4s ease-in-out;
+        }
+        /* Star trail animation styling */
+        .star-trail {
+            position: absolute;
+            pointer-events: none;
+            width: 12px;
+            height: 12px;
+            background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(244,63,94,0.4) 60%, rgba(0,0,0,0) 100%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: trailFade 0.8s forwards;
+            z-index: 9999;
+        }
+        @keyframes trailFade {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+        }
+
+        /* SVG Dash rotation animation */
+        @keyframes border-crawl {
+            0% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: 36; }
+        }
+        .animated-dashed-rect {
+            animation: border-crawl 1.2s linear infinite;
+        }
+
+        @keyframes pulse-glowing-aurora {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.15; }
+            50% { transform: scale(1.15) rotate(180deg); opacity: 0.3; }
+        }
+        .pulse-aurora {
+            animation: pulse-glowing-aurora 8s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="relative w-screen h-screen text-slate-100 flex items-center justify-center select-none overflow-hidden">
+
+    <!-- 3D WebGL Background Canvas -->
+    <canvas id="webgl-canvas" class="absolute inset-0 w-full h-full z-0 pointer-events-auto"></canvas>
+
+    <!-- Deep Space Magic Vignette -->
+    <div class="absolute inset-0 pointer-events-none z-10" style="background: radial-gradient(circle at center, transparent 30%, rgba(4, 2, 9, 0.95) 100%);"></div>
+
+    <!-- AUDIO TOGGLE BUTTON (Floating Top-Right) -->
+    <button id="audio-toggle" class="absolute top-6 right-6 z-50 p-3.5 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 rounded-full transition-all duration-300 hidden items-center justify-center backdrop-blur-md">
+        <svg id="audio-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+        </svg>
+    </button>
+
+    <!-- PASSWORD LOCK SCREEN OVERLAY -->
+    <!-- Prompts for 'nautanki' to decrypt and open experience -->
+    <div id="password-screen" class="absolute inset-0 z-50 flex flex-col items-center justify-center p-6 text-center bg-[#040209] transition-all duration-1000">
+        <div id="password-card" class="max-w-md w-full mx-auto p-8 rounded-3xl glass-card space-y-6 shadow-2xl relative transition-all duration-300">
+            <div class="text-6xl animate-bounce">🔒</div>
+            <h2 class="whimsical-font text-3xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-cyan-300">
+                Secured Cosmic Sector
+            </h2>
+            <p class="text-xs text-slate-400 max-w-xs mx-auto leading-relaxed">
+                This beautiful nonsense is protected by an advanced alien firewall. Enter the secret passcode to unlock your brain cell.
+            </p>
+            <div class="space-y-3">
+                <input type="password" id="passcode-input" placeholder="Hint: what is your favorite drama? 🤫" 
+                       class="w-full px-5 py-3 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pink-500/50 text-center text-slate-100 placeholder-slate-500 transition-all font-medium tracking-widest text-lg">
+                <p id="password-error" class="text-rose-400 text-xs font-semibold h-4 opacity-0 transition-opacity duration-300"></p>
+            </div>
+            <button id="btn-unlock" class="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold tracking-widest uppercase text-xs hover:from-pink-600 hover:to-purple-700 transition-all duration-300 shadow-[0_0_20px_rgba(236,72,153,0.3)] hover:scale-[1.02] active:scale-95 whimsical-font">
+                Unlock Galaxy ✨
+            </button>
+        </div>
+    </div>
+
+    <!-- STEP 0: THE ENTERING SCREEN -->
+    <div id="intro-screen" class="absolute inset-0 z-40 flex flex-col items-center justify-center p-6 text-center transition-all duration-1000 bg-[#040209] hidden">
+        <div class="max-w-xl mx-auto space-y-8 px-4 playful-float">
+            <div class="text-6xl animate-bounce">🎈</div>
+            <h1 class="whimsical-font text-5xl md:text-6xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-300 to-cyan-300 leading-tight">
+                To My Favorite <br><span class="text-pink-400 italic">Chaotic Human</span>
+            </h1>
+            <p class="text-base text-slate-400 font-medium tracking-wide max-w-sm mx-auto leading-relaxed">
+                A highly scientific, totally serious 3D simulation made specifically for your cute, empty brain.
+            </p>
+            <button id="btn-begin" class="relative group mt-6 px-10 py-4 overflow-hidden rounded-full border-2 border-pink-400/30 bg-pink-500/10 hover:bg-pink-500/20 transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(236,72,153,0.2)]">
+                <span class="relative text-base tracking-widest uppercase font-bold text-pink-300 group-hover:text-white transition-colors duration-300">
+                    Press Here, Dummy!
+                </span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN INTERACTIVE INTERFACE (Playful HUD Overlay Left-Aligned & Mobile Friendly) -->
+    <div id="narrative-container" class="absolute bottom-6 left-4 right-4 mx-auto max-w-lg md:max-w-md md:left-12 md:bottom-12 md:mx-0 md:translate-x-0 z-30 transition-all duration-1000 transform translate-y-10 opacity-0 pointer-events-none">
+        <!-- Whimsical Ultra-Transparent Glassmorphism Card with Deeper Blur -->
+        <div class="relative w-full p-6 md:p-8 rounded-3xl glass-card bubble-glow overflow-hidden">
+            <!-- Colorful background glowing orbs -->
+            <div class="absolute -top-12 -left-12 w-28 h-28 bg-pink-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-12 -right-12 w-28 h-28 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Chapter Marker / Fun tag -->
+            <div class="flex items-center space-x-3 mb-4">
+                <span class="h-1.5 w-1.5 rounded-full bg-pink-400 animate-ping"></span>
+                <span id="chapter-index" class="text-xs uppercase tracking-widest font-bold text-pink-400 whimsical-font">Dumb Constellation I</span>
+            </div>
+
+            <!-- Main Narrative Text -->
+            <div class="min-h-[140px] flex items-center">
+                <h2 id="narrative-text" class="text-lg md:text-xl font-semibold leading-relaxed text-slate-100 tracking-wide">
+                    Summoning your single brain cell...
+                </h2>
+            </div>
+
+            <!-- Playful Interaction hint -->
+            <p id="interaction-hint" class="text-slate-500 text-[10px] md:text-xs tracking-wider font-medium mt-6 mb-2">
+                👇 Drag around to make the universe dizzy &bull; Click to pop space bubbles!
+            </p>
+
+            <!-- Navigation Controls -->
+            <div class="flex items-center justify-between mt-6 pt-4 border-t border-white/10">
+                <div class="flex space-x-1.5">
+                    <span id="dot-0" class="w-2.5 h-2.5 rounded-full bg-pink-400 transition-all duration-300"></span>
+                    <span id="dot-1" class="w-2.5 h-2.5 rounded-full bg-white/20 transition-all duration-300"></span>
+                    <span id="dot-2" class="w-2.5 h-2.5 rounded-full bg-white/20 transition-all duration-300"></span>
+                    <span id="dot-3" class="w-2.5 h-2.5 rounded-full bg-white/20 transition-all duration-300"></span>
+                    <span id="dot-4" class="w-2.5 h-2.5 rounded-full bg-white/20 transition-all duration-300"></span>
+                </div>
+
+                <div class="flex space-x-3">
+                    <button id="btn-prev" class="p-2.5 md:p-3 rounded-full border border-white/10 hover:border-white/30 bg-white/5 text-slate-400 hover:text-white transition-all duration-300 disabled:opacity-30 disabled:pointer-events-none" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button id="btn-next" class="px-5 py-2.5 md:px-6 md:py-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold tracking-wider hover:from-pink-600 hover:to-purple-700 transition-all duration-300 shadow-[0_0_20px_rgba(236,72,153,0.3)] hover:scale-105 active:scale-95 flex items-center space-x-2 whimsical-font text-xs md:text-sm">
+                        <span id="btn-next-text">Next</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PLAYFUL EVASIVE DIALOG OVERLAY ("Are you dumb?") -->
+    <div id="dumb-modal" class="absolute inset-0 z-50 flex items-center justify-center p-6 bg-black/85 backdrop-blur-sm hidden transition-opacity duration-300 opacity-0">
+        <div class="max-w-sm w-full p-8 rounded-3xl border border-pink-500/30 bg-[#0c0914] text-center shadow-2xl relative space-y-6">
+            <div class="text-5xl animate-bounce">🧐</div>
+            <h3 class="whimsical-font text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-yellow-300">
+                Sach Bolo... Are you dumb?
+            </h3>
+            <p class="text-sm text-slate-400">
+                Please click YES if your tubelight takes 5 minutes to switch on. Don't do over-acting, tell the truth!
+            </p>
+            <!-- Layout container so YES and NO buttons are placed beautifully side-by-side -->
+            <div class="flex justify-center items-center gap-6 pt-4 min-h-[80px] relative w-full" id="modal-button-area">
+                <button id="btn-yes" class="px-8 py-3 rounded-2xl bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-slate-900 font-extrabold tracking-wider transition-all duration-300 transform hover:scale-110 active:scale-95 shadow-lg z-10">
+                    YES YAAR
+                </button>
+                <button id="btn-no" class="px-8 py-3 rounded-2xl bg-rose-500 text-white font-bold tracking-wider transition-all duration-200 shadow-md z-20">
+                    NO RE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOCK DUMBNESS CERTIFICATE MODAL -->
+    <div id="cert-modal" class="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md hidden transition-opacity duration-500 opacity-0">
+        <div id="cert-card" class="max-w-md w-full p-6 md:p-8 rounded-3xl bg-gradient-to-b from-[#160f29] to-[#0a0614] text-center shadow-2xl space-y-5 relative overflow-hidden border-2 border-transparent">
+            
+            <!-- Animated Dash Border (SVG overlay mimicking image_5a1668.png exactly but moving) -->
+            <svg class="absolute inset-0 w-full h-full pointer-events-none rounded-3xl" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="3" width="calc(100% - 6px)" height="calc(100% - 6px)" rx="24" fill="none" stroke="#fbbf24" stroke-width="4.5" stroke-dasharray="12 10" class="animated-dashed-rect"/>
+            </svg>
+
+            <!-- Confetti glowing pulsing aura background -->
+            <div class="absolute -top-12 -left-12 w-32 h-32 bg-yellow-400/10 rounded-full blur-3xl pulse-aurora"></div>
+            <div class="absolute -bottom-12 -right-12 w-32 h-32 bg-pink-500/10 rounded-full blur-3xl pulse-aurora"></div>
+
+            <div class="text-6xl animate-bounce mt-4">🎓</div>
+            <div class="uppercase tracking-widest text-[10px] font-bold text-yellow-400 whimsical-font">All India Association of Dramebaaz & Over-Actors</div>
+            <h2 class="whimsical-font text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-yellow-300 to-cyan-300 leading-tight">
+                Certificate of <br>Full-On Tubelight Brain
+            </h2>
+            <div class="w-16 h-0.5 bg-yellow-400/40 mx-auto"></div>
+            <p class="text-xs md:text-sm text-slate-300 leading-relaxed max-w-sm mx-auto">
+                This document officially verifies that the recipient operates entirely on <span class="text-pink-400 font-bold">exactly one (1) tiny popcorn kernel</span> bouncing around her empty dabba. Her brain cell operates on low battery and takes 5 minutes to understand a simple joke.
+            </p>
+            <p class="text-[10px] md:text-xs text-slate-500 italic">
+                Current Status: Zero percent physics sense, 100% nautanki, but infinitely cute.
+            </p>
+            <button id="btn-cert-accept" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-yellow-400 to-pink-500 text-slate-900 font-black tracking-widest uppercase text-xs hover:from-yellow-500 hover:to-pink-600 transition-all duration-300 shadow-[0_0_20px_rgba(251,191,36,0.3)] hover:scale-102 active:scale-95 whimsical-font mt-4">
+                Haan Baba, I Accept My Destiny! 🤭
+            </button>
+        </div>
+    </div>
+
+    <!-- Floating Top Gesture Instruction -->
+    <div id="gesture-hint" class="absolute top-8 left-1/2 -translate-x-1/2 text-center text-slate-400/50 font-medium text-[10px] md:text-xs tracking-widest hidden select-none pointer-events-none">
+        SPIN THE GALAXY WITH YOUR FINGER!
+    </div>
+
+    <!-- JAVASCRIPT: Playful logic, Morphing WebGL Constellations, & Audio Synth -->
+    <script>
+        // --- NARRATIVE DATABASE ---
+        const chapters = [
+            {
+                tag: "A Very Serious Math Fact",
+                text: "In a universe with billions of galaxies and super smart planets... there's one tiny, beautifully chaotic, highly uncoordinated ball of energy.",
+                color: "#f43f5e",
+                speed: 1.2,
+                wobbleAmp: 0.15
+            },
+            {
+                tag: "Gravity vs. Goofiness",
+                text: "Specifically, a wonderfully goofy human who has absolutely no idea how physics works, yet somehow manages to drag everyone into her happy orbit.",
+                color: "#e879f9",
+                speed: 1.9,
+                wobbleAmp: 0.3
+            },
+            {
+                tag: "The Brain Cell Report",
+                text: "Honestly, your brain is probably just a single golden popcorn kernel bouncing around in there. But that is exactly what makes you so magical.",
+                color: "#38bdf8",
+                speed: 2.8,
+                wobbleAmp: 0.5
+            },
+            {
+                tag: "Why We Need You",
+                text: "The real world is way too serious, boring, and sensible. But whenever you are around, everything turns into colorful, laughing, beautiful nonsense.",
+                color: "#fbbf24",
+                speed: 1.5,
+                wobbleAmp: 0.25
+            },
+            {
+                tag: "My Message To You",
+                text: "Never grow up. Never become 'normal'. You are my absolute favorite chaos, my brightest star, and my life would be so incredibly boring without you. 💖",
+                color: "#ec4899",
+                speed: 1.0,
+                wobbleAmp: 0.1
+            }
+        ];
+
+        let currentChapter = 0;
+
+        // --- GLOBAL SOUND ENGINE (Toy Synth / Music Box) ---
+        class MusicBoxSoundscape {
+            constructor() {
+                this.ctx = null;
+                this.masterVolume = null;
+                this.initialized = false;
+                this.isPlaying = false;
+                this.delayNode = null;
+                this.ambientTimer = null;
+            }
+
+            init() {
+                if (this.initialized) return;
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                    
+                    // Master volume setup
+                    this.masterVolume = this.ctx.createGain();
+                    this.masterVolume.gain.setValueAtTime(0.001, this.ctx.currentTime);
+                    this.masterVolume.connect(this.ctx.destination);
+
+                    // Celestial Delay for music box echoes
+                    this.delayNode = this.ctx.createDelay();
+                    this.delayNode.delayTime.setValueAtTime(0.3, this.ctx.currentTime);
+                    const feedback = this.ctx.createGain();
+                    feedback.gain.setValueAtTime(0.5, this.ctx.currentTime);
+
+                    this.delayNode.connect(feedback);
+                    feedback.connect(this.delayNode);
+                    this.delayNode.connect(this.masterVolume);
+
+                    this.initialized = true;
+                } catch (e) {
+                    console.error("Web Audio failed", e);
+                }
+            }
+
+            playPluck(freq, delayOffset = 0) {
+                if (!this.initialized || !this.isPlaying) return;
+                const now = this.ctx.currentTime + delayOffset;
+
+                const osc = this.ctx.createOscillator();
+                const gainNode = this.ctx.createGain();
+
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, now);
+
+                osc.connect(gainNode);
+                gainNode.connect(this.delayNode);
+                gainNode.connect(this.masterVolume);
+
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(0.12, now + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+
+                osc.start(now);
+                osc.stop(now + 1.5);
+            }
+
+            playBubblePop(freq = 400) {
+                if (!this.initialized || !this.isPlaying) return;
+                const now = this.ctx.currentTime;
+
+                const osc = this.ctx.createOscillator();
+                const gainNode = this.ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now);
+                osc.frequency.exponentialRampToValueAtTime(freq * 2.2, now + 0.15);
+
+                osc.connect(gainNode);
+                gainNode.connect(this.masterVolume);
+
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(0.15, now + 0.02);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+
+                osc.start(now);
+                osc.stop(now + 0.3);
+            }
+
+            startAmbience() {
+                this.init();
+                if (!this.initialized) return;
+                this.isPlaying = true;
+                
+                this.masterVolume.gain.linearRampToValueAtTime(0.5, this.ctx.currentTime + 2);
+
+                const notes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33];
+                let step = 0;
+
+                const arpeggiate = () => {
+                    if (!this.isPlaying) return;
+                    
+                    const melody = [2, 4, 0, 3, 5, 1, 4, 6];
+                    const noteFreq = notes[melody[step % melody.length]];
+                    
+                    const octaveMultiplier = Math.random() > 0.75 ? 2 : 1;
+                    this.playPluck(noteFreq * octaveMultiplier);
+
+                    step++;
+                    this.ambientTimer = setTimeout(arpeggiate, 450 + Math.random() * 100);
+                };
+
+                arpeggiate();
+            }
+
+            stopAmbience() {
+                this.isPlaying = false;
+                if (this.ambientTimer) clearTimeout(this.ambientTimer);
+                if (this.masterVolume) {
+                    this.masterVolume.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 1);
+                }
+            }
+        }
+
+        const audioController = new MusicBoxSoundscape();
+
+        // --- THREE.JS ENGINE SETUP ---
+        const canvas = document.getElementById('webgl-canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x040209, 0.012);
+
+        const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 45;
+
+        // Magical colorful scene lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const pinkLight = new THREE.PointLight(0xf43f5e, 2.5, 90);
+        pinkLight.position.set(15, 15, 10);
+        scene.add(pinkLight);
+
+        const blueLight = new THREE.PointLight(0x38bdf8, 2.5, 90);
+        blueLight.position.set(-15, -15, 10);
+        scene.add(blueLight);
+
+        // Interaction coordinates tracking
+        let mouseX = 0, mouseY = 0;
+        let targetX = 0, targetY = 0;
+
+        // Create the morphing cosmic points
+        const particleCount = 4000;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+        
+        // Target buffers for transitioning calculations
+        const currentPositions = new Float32Array(particleCount * 3);
+        const targetPositions = new Float32Array(particleCount * 3);
+        const velocityOffsets = new Float32Array(particleCount * 3);
+
+        const neonPalette = [
+            new THREE.Color(0xf43f5e), // Bold pink
+            new THREE.Color(0x38bdf8), // Soft cyan
+            new THREE.Color(0xe879f9), // Bright purple
+            new THREE.Color(0xfbbf24), // Cute gold
+            new THREE.Color(0xffffff)  // Sparkle white
+        ];
+
+        // Particle configuration formulas
+        function generateTorusTarget(arr) {
+            const R = 11.0;
+            const r = 4.0;
+            for (let i = 0; i < particleCount; i++) {
+                const u = Math.random() * Math.PI * 2;
+                const v = Math.random() * Math.PI * 2;
+                arr[i * 3]     = (R + r * Math.cos(v)) * Math.cos(u);
+                arr[i * 3 + 1] = (R + r * Math.cos(v)) * Math.sin(u);
+                arr[i * 3 + 2] = r * Math.sin(v) + (Math.random() - 0.5) * 1.5;
+            }
+        }
+
+        function generateVortexTarget(arr) {
+            for (let i = 0; i < particleCount; i++) {
+                const theta = Math.random() * 25.0;
+                const dist = 1.2 * theta + 1.0;
+                const spiralArm = (i % 3) * ((2 * Math.PI) / 3);
+                arr[i * 3]     = dist * Math.cos(theta + spiralArm) + (Math.random() - 0.5) * 1.5;
+                arr[i * 3 + 1] = dist * Math.sin(theta + spiralArm) + (Math.random() - 0.5) * 1.5;
+                arr[i * 3 + 2] = (Math.random() - 0.5) * 4.0 - (theta * 0.2);
+            }
+        }
+
+        function generateSynapsesTarget(arr) {
+            const centerCount = 5;
+            const centers = [
+                new THREE.Vector3(-12, 8, 0),
+                new THREE.Vector3(12, 10, -5),
+                new THREE.Vector3(0, -6, 4),
+                new THREE.Vector3(-10, -8, -2),
+                new THREE.Vector3(10, -9, 3)
+            ];
+            for (let i = 0; i < particleCount; i++) {
+                const cIdx = i % centerCount;
+                const center = centers[cIdx];
+                const u = Math.random() * Math.PI * 2;
+                const v = Math.acos((Math.random() * 2) - 1);
+                const r = 2.5 + Math.random() * 2.0;
+
+                arr[i * 3]     = center.x + r * Math.sin(v) * Math.cos(u);
+                arr[i * 3 + 1] = center.y + r * Math.sin(v) * Math.sin(u);
+                arr[i * 3 + 2] = center.z + r * Math.cos(v);
+            }
+        }
+
+        function generateSupernovaTarget(arr) {
+            for (let i = 0; i < particleCount; i++) {
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos((Math.random() * 2) - 1);
+                const radialRatio = 12.0 + 5.0 * Math.sin(5 * theta) * Math.cos(4 * phi);
+                arr[i * 3]     = radialRatio * Math.sin(phi) * Math.cos(theta);
+                arr[i * 3 + 1] = radialRatio * Math.sin(phi) * Math.sin(theta);
+                arr[i * 3 + 2] = radialRatio * Math.cos(phi) + (Math.random() - 0.5) * 1.5;
+            }
+        }
+
+        function generateHeartTarget(arr) {
+            for (let i = 0; i < particleCount; i++) {
+                const t = Math.PI * 2 * Math.random();
+                const u = Math.PI * (Math.random() - 0.5);
+
+                const x = 16 * Math.pow(Math.sin(t), 3);
+                const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+                const z = 7 * Math.sin(u) * (3.5 + Math.sin(t));
+
+                arr[i * 3]     = x * 1.1;
+                arr[i * 3 + 1] = y * 1.1;
+                arr[i * 3 + 2] = z * 1.1 + (Math.random() - 0.5) * 1.5;
+            }
+        }
+
+        // Initialize points setup
+        generateTorusTarget(currentPositions);
+        generateTorusTarget(targetPositions);
+
+        for (let i = 0; i < particleCount; i++) {
+            positions[i * 3] = currentPositions[i * 3];
+            positions[i * 3 + 1] = currentPositions[i * 3 + 1];
+            positions[i * 3 + 2] = currentPositions[i * 3 + 2];
+
+            const randomColor = neonPalette[Math.floor(Math.random() * neonPalette.length)];
+            colors[i * 3] = randomColor.r;
+            colors[i * 3 + 1] = randomColor.g;
+            colors[i * 3 + 2] = randomColor.b;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        const createSoftBubbleTexture = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            
+            const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            gradient.addColorStop(0.3, 'rgba(244, 63, 94, 0.9)');
+            gradient.addColorStop(0.6, 'rgba(56, 189, 248, 0.3)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 64, 64);
+            
+            return new THREE.CanvasTexture(canvas);
+        };
+
+        const material = new THREE.PointsMaterial({
+            size: 1.1,
+            map: createSoftBubbleTexture(),
+            vertexColors: true,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
+        const activePoints = new THREE.Points(geometry, material);
+        scene.add(activePoints);
+
+        // Ambient Background space bubbles
+        const ambientStarCount = 800;
+        const starGeo = new THREE.BufferGeometry();
+        const starPos = new Float32Array(ambientStarCount * 3);
+        const starColors = new Float32Array(ambientStarCount * 3);
+
+        for (let i = 0; i < ambientStarCount; i++) {
+            const theta = THREE.MathUtils.randFloatSpread(360);
+            const phi = THREE.MathUtils.randFloatSpread(360);
+            const dist = THREE.MathUtils.randFloat(80, 250);
+
+            starPos[i*3] = dist * Math.sin(theta) * Math.cos(phi);
+            starPos[i*3+1] = dist * Math.sin(theta) * Math.sin(phi);
+            starPos[i*3+2] = dist * Math.cos(theta);
+
+            const clr = neonPalette[Math.floor(Math.random() * neonPalette.length)];
+            starColors[i*3] = clr.r;
+            starColors[i*3+1] = clr.g;
+            starColors[i*3+2] = clr.b;
+        }
+
+        starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+        starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+
+        const starMat = new THREE.PointsMaterial({
+            size: 0.6,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.5,
+            blending: THREE.AdditiveBlending
+        });
+
+        const starField = new THREE.Points(starGeo, starMat);
+        scene.add(starField);
+
+        // --- INTERACTIVE BUBBLE SPARKS ---
+        const activeBubbles = [];
+
+        function popSpaceBubble(x, y) {
+            const vector = new THREE.Vector3(x, y, 0.5).unproject(camera);
+            const dir = vector.sub(camera.position).normalize();
+            const distance = -camera.position.z / dir.z;
+            const pos = camera.position.clone().add(dir.multiplyScalar(distance));
+
+            const bubbleCount = 20;
+            const bubblePositions = new Float32Array(bubbleCount * 3);
+            const bubbleVelocities = [];
+
+            for (let i = 0; i < bubbleCount; i++) {
+                bubblePositions[i * 3] = pos.x;
+                bubblePositions[i * 3 + 1] = pos.y;
+                bubblePositions[i * 3 + 2] = pos.z;
+
+                bubbleVelocities.push(new THREE.Vector3(
+                    (Math.random() - 0.5) * 8,
+                    (Math.random() - 0.3) * 8,
+                    (Math.random() - 0.5) * 8
+                ));
+            }
+
+            const bubbleGeo = new THREE.BufferGeometry();
+            bubbleGeo.setAttribute('position', new THREE.BufferAttribute(bubblePositions, 3));
+
+            const colorsArray = new Float32Array(bubbleCount * 3);
+            for (let i = 0; i < bubbleCount; i++) {
+                const randomClr = neonPalette[Math.floor(Math.random() * neonPalette.length)];
+                colorsArray[i*3] = randomClr.r;
+                colorsArray[i*3+1] = randomClr.g;
+                colorsArray[i*3+2] = randomClr.b;
+            }
+            bubbleGeo.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
+
+            const bubbleMat = new THREE.PointsMaterial({
+                size: 1.6,
+                map: createSoftBubbleTexture(),
+                vertexColors: true,
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
+
+            const points = new THREE.Points(bubbleGeo, bubbleMat);
+            scene.add(points);
+
+            activeBubbles.push({
+                mesh: points,
+                velocities: bubbleVelocities,
+                opacity: 1.0
+            });
+
+            const pitch = 250 + Math.random() * 800;
+            audioController.playBubblePop(pitch);
+        }
+
+        // --- ANIMATION FRAME ---
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const elapsedTime = clock.getElapsedTime();
+            const currentSpeedMultiplier = chapters[currentChapter].speed;
+
+            // Coordinate interpolation & transition physics
+            const posAttr = activePoints.geometry.attributes.position;
+            for (let i = 0; i < particleCount; i++) {
+                velocityOffsets[i * 3]     *= 0.92;
+                velocityOffsets[i * 3 + 1] *= 0.92;
+                velocityOffsets[i * 3 + 2] *= 0.92;
+
+                currentPositions[i * 3]     += (targetPositions[i * 3] - currentPositions[i * 3]) * 0.05 + velocityOffsets[i * 3];
+                currentPositions[i * 3 + 1] += (targetPositions[i * 3 + 1] - currentPositions[i * 3 + 1]) * 0.05 + velocityOffsets[i * 3 + 1];
+                currentPositions[i * 3 + 2] += (targetPositions[i * 3 + 2] - currentPositions[i * 3 + 2]) * 0.05 + velocityOffsets[i * 3 + 2];
+
+                posAttr.array[i * 3]     = currentPositions[i * 3];
+                posAttr.array[i * 3 + 1] = currentPositions[i * 3 + 1];
+                posAttr.array[i * 3 + 2] = currentPositions[i * 3 + 2];
+            }
+            posAttr.needsUpdate = true;
+
+            // Heartbeat pulse scaling
+            const pulse = 1.0 + Math.sin(elapsedTime * 2.5) * 0.08;
+            activePoints.scale.set(pulse, pulse, pulse);
+
+            // Constant gentle rotations
+            activePoints.rotation.y = elapsedTime * 0.08 * currentSpeedMultiplier;
+            activePoints.rotation.x = Math.sin(elapsedTime * 0.5) * 0.08;
+
+            starField.rotation.y = -elapsedTime * 0.015;
+
+            // Parallax camera adjustments
+            targetX = THREE.MathUtils.lerp(targetX, mouseX, 0.06);
+            targetY = THREE.MathUtils.lerp(targetY, mouseY, 0.06);
+
+            camera.position.x = (targetX * 28);
+            camera.position.y = (-targetY * 28);
+            camera.lookAt(scene.position);
+
+            // Space bubbles pop simulation
+            for (let i = activeBubbles.length - 1; i >= 0; i--) {
+                const bubble = activeBubbles[i];
+                const positionsAttr = bubble.mesh.geometry.attributes.position;
+
+                bubble.opacity -= 0.022;
+                bubble.mesh.material.opacity = bubble.opacity;
+
+                for (let j = 0; j < positionsAttr.count; j++) {
+                    const vel = bubble.velocities[j];
+                    positionsAttr.array[j * 3]     += vel.x * 0.05;
+                    positionsAttr.array[j * 3 + 1]     += vel.y * 0.05;
+                    positionsAttr.array[j * 3 + 2]     += vel.z * 0.05;
+                }
+                positionsAttr.needsUpdate = true;
+
+                if (bubble.opacity <= 0) {
+                    scene.remove(bubble.mesh);
+                    bubble.mesh.geometry.dispose();
+                    bubble.mesh.material.dispose();
+                    activeBubbles.splice(i, 1);
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // --- GESTURES AND TOUCH MOVES ---
+        function onMouseMove(event) {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = (event.clientY / window.innerHeight) * 2 - 1;
+            spawnStarTrail(event.clientX, event.clientY);
+        }
+
+        function onTouchMove(event) {
+            if (event.touches.length > 0) {
+                mouseX = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
+                mouseY = (event.touches[0].clientY / window.innerHeight) * 2 - 1;
+                spawnStarTrail(event.touches[0].clientX, event.touches[0].clientY);
+            }
+        }
+
+        function spawnStarTrail(x, y) {
+            const trail = document.createElement('div');
+            trail.className = 'star-trail';
+            trail.style.left = `${x}px`;
+            trail.style.top = `${y}px`;
+            document.body.appendChild(trail);
+            setTimeout(() => trail.remove(), 800);
+        }
+
+        function onSceneClick(event) {
+            if (event.target.closest('#narrative-container') || 
+                event.target.closest('#audio-toggle') || 
+                event.target.closest('#password-screen') || 
+                event.target.closest('#intro-screen') ||
+                event.target.closest('#dumb-modal') ||
+                event.target.closest('#cert-modal')) {
+                return;
+            }
+            const normX = (event.clientX / window.innerWidth) * 2 - 1;
+            const normY = -(event.clientY / window.innerHeight) * 2 + 1;
+            popSpaceBubble(normX, normY);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        window.addEventListener('resize', onWindowResize);
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('touchmove', onTouchMove);
+        window.addEventListener('click', onSceneClick);
+
+        // --- STATE MANAGEMENT VARIABLES ---
+        const passwordScreen = document.getElementById('password-screen');
+        const passwordCard = document.getElementById('password-card');
+        const passcodeInput = document.getElementById('passcode-input');
+        const btnUnlock = document.getElementById('btn-unlock');
+        const passwordError = document.getElementById('password-error');
+
+        const introScreen = document.getElementById('intro-screen');
+        const narrativeContainer = document.getElementById('narrative-container');
+        const btnBegin = document.getElementById('btn-begin');
+        const audioToggle = document.getElementById('audio-toggle');
+        const audioIcon = document.getElementById('audio-icon');
+
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const btnNextText = document.getElementById('btn-next-text');
+        const narrativeText = document.getElementById('narrative-text');
+        const chapterIndex = document.getElementById('chapter-index');
+        const gestureHint = document.getElementById('gesture-hint');
+
+        // Playful Evasive Dialog Elements
+        const dumbModal = document.getElementById('dumb-modal');
+        const btnYes = document.getElementById('btn-yes');
+        const btnNo = document.getElementById('btn-no');
+        const modalButtonArea = document.getElementById('modal-button-area');
+
+        // Certification Elements
+        const certModal = document.getElementById('cert-modal');
+        const btnCertAccept = document.getElementById('btn-cert-accept');
+
+        // Encryption validation
+        const secretHash = "bmF1dGFua2k="; // Base64 representation of "nautanki"
+        const wrongPasscodeResponses = [
+            "Arre yaar! Wrong password. Don't do nautanki here! 🕵️‍♀️",
+            "Aiyyo! Wrong code! Ask your favorite idiot for help.",
+            "Kya yaar? Guessing game running? Type correct password!",
+            "Access Denied. Hint: Starts with 'n' and ends with 'ki'.",
+            "Nope! That is highly unauthorized behavior re!"
+        ];
+
+        function attemptUnlock() {
+            const entered = passcodeInput.value.toLowerCase().trim();
+            if (btoa(entered) === secretHash) {
+                audioController.init();
+                audioController.isPlaying = true;
+                // Success ascending chords
+                audioController.playPluck(523.25, 0);
+                audioController.playPluck(659.25, 0.08);
+                audioController.playPluck(783.99, 0.16);
+                audioController.playPluck(1046.50, 0.24);
+
+                passwordScreen.style.opacity = '0';
+                setTimeout(() => {
+                    passwordScreen.classList.add('hidden');
+                    introScreen.classList.remove('hidden');
+                }, 1000);
+            } else {
+                audioController.init();
+                audioController.isPlaying = true;
+                audioController.playBubblePop(180);
+
+                passwordCard.classList.remove('shake-active');
+                void passwordCard.offsetWidth; // force layout reflow
+                passwordCard.classList.add('shake-active');
+
+                const randomMsg = wrongPasscodeResponses[Math.floor(Math.random() * wrongPasscodeResponses.length)];
+                passwordError.textContent = randomMsg;
+                passwordError.style.opacity = '1';
+                passcodeInput.value = '';
+            }
+        }
+
+        btnUnlock.addEventListener('click', attemptUnlock);
+        passcodeInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') attemptUnlock();
+        });
+
+        // --- USER STORY FLOW CONTROLLERS ---
+        btnBegin.addEventListener('click', () => {
+            audioController.startAmbience();
+
+            introScreen.style.opacity = '0';
+            introScreen.style.transform = 'translateY(-50px) scale(0.95)';
+            
+            setTimeout(() => {
+                introScreen.classList.add('hidden');
+                
+                narrativeContainer.classList.remove('pointer-events-none');
+                narrativeContainer.style.opacity = '1';
+                narrativeContainer.style.transform = 'translateY(0)';
+                
+                audioToggle.classList.remove('hidden');
+                audioToggle.classList.add('flex');
+                
+                gestureHint.classList.remove('hidden');
+
+                updateNarrativeView();
+            }, 1000);
+        });
+
+        audioToggle.addEventListener('click', () => {
+            if (audioController.isPlaying) {
+                audioController.stopAmbience();
+                audioIcon.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                    </svg>
+                `;
+            } else {
+                audioController.startAmbience();
+                audioIcon.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    </svg>
+                `;
+            }
+        });
+
+        // --- GALAXY MORPHING ALGORITHMS ---
+        function updateTargetConstellation() {
+            // Apply warp-drive explosion impulse vectors
+            for (let i = 0; i < particleCount; i++) {
+                velocityOffsets[i * 3]     = (Math.random() - 0.5) * 6.5;
+                velocityOffsets[i * 3 + 1] = (Math.random() - 0.5) * 6.5;
+                velocityOffsets[i * 3 + 2] = (Math.random() - 0.5) * 6.5;
+            }
+
+            // Route target configurations
+            if (currentChapter === 0) {
+                generateTorusTarget(targetPositions);
+            } else if (currentChapter === 1) {
+                generateVortexTarget(targetPositions);
+            } else if (currentChapter === 2) {
+                generateSynapsesTarget(targetPositions);
+            } else if (currentChapter === 3) {
+                generateSupernovaTarget(targetPositions);
+            } else if (currentChapter === 4) {
+                generateHeartTarget(targetPositions);
+            }
+        }
+
+        function updateNarrativeView() {
+            const data = chapters[currentChapter];
+
+            // Trigger structural transformations
+            updateTargetConstellation();
+
+            // Text scaling animation
+            narrativeText.style.opacity = '0';
+            narrativeText.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                narrativeText.textContent = data.text;
+                chapterIndex.textContent = `Dumb Constellation ${romanize(currentChapter + 1)} — ${data.tag}`;
+                chapterIndex.style.color = data.color;
+                
+                narrativeText.style.opacity = '1';
+                narrativeText.style.transform = 'scale(1)';
+                narrativeText.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            }, 300);
+
+            // Progress tracking dots update
+            for (let i = 0; i < chapters.length; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i === currentChapter) {
+                    dot.style.width = '24px';
+                    dot.style.backgroundColor = data.color;
+                } else {
+                    dot.style.width = '10px';
+                    dot.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                }
+            }
+
+            btnPrev.disabled = currentChapter === 0;
+            
+            if (currentChapter === chapters.length - 1) {
+                btnNextText.textContent = "Again?";
+            } else {
+                btnNextText.textContent = "Next";
+            }
+
+            triggerBouncyTransition(data.color);
+        }
+
+        function triggerBouncyTransition(hexColor) {
+            const clr = new THREE.Color(hexColor);
+            pinkLight.color.copy(clr);
+
+            let originalSize = material.size;
+            let count = 0;
+            const sizePulse = setInterval(() => {
+                count++;
+                if (count < 15) {
+                    material.size += 0.12;
+                } else {
+                    material.size -= 0.12;
+                }
+
+                if (count >= 30) {
+                    material.size = originalSize;
+                    clearInterval(sizePulse);
+                }
+            }, 10);
+            
+            // Chord Progression
+            audioController.playPluck(329.63, 0); 
+            audioController.playPluck(392.00, 0.1); 
+            audioController.playPluck(523.25, 0.2); 
+        }
+
+        function romanize(num) {
+            const lookup = {M:1000,CM:900,D:500,CD:400,C:100,XC:90,L:50,XL:40,X:10,IX:9,V:5,IV:4,I:1};
+            let roman = '';
+            for (let i in lookup) {
+                while (num >= lookup[i]) {
+                    roman += i;
+                    num -= lookup[i];
+                }
+            }
+            return roman;
+        }
+
+        btnNext.addEventListener('click', () => {
+            if (currentChapter < chapters.length - 1) {
+                currentChapter++;
+                updateNarrativeView();
+            } else {
+                // Show "Are you dumb?" modal
+                dumbModal.classList.remove('hidden');
+                setTimeout(() => {
+                    dumbModal.classList.add('opacity-100');
+                    dumbModal.classList.remove('opacity-0');
+                }, 10);
+            }
+        });
+
+        btnPrev.addEventListener('click', () => {
+            if (currentChapter > 0) {
+                currentChapter--;
+                updateNarrativeView();
+            }
+        });
+
+        // --- EVASIVE GAME CONTROLLER ---
+        function moveNoButton() {
+            const btnArea = modalButtonArea.getBoundingClientRect();
+            // Constrain coords safely within current window limits
+            const maxX = window.innerWidth - 120;
+            const maxY = window.innerHeight - 60;
+            
+            const randomX = Math.random() * maxX;
+            const randomY = Math.random() * maxY;
+
+            // Shift position mode to viewport body level to bypass relative bounds
+            btnNo.style.position = 'fixed';
+            btnNo.style.left = `${randomX}px`;
+            btnNo.style.top = `${randomY}px`;
+
+            // Play squeak escape tone
+            audioController.playBubblePop(700 + Math.random() * 400);
+        }
+
+        // Avoid cursor completely on hover (Desktop)
+        btnNo.addEventListener('mouseenter', moveNoButton);
+        // Avoid finger tap immediately before registering touch clicks (Mobile)
+        btnNo.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            moveNoButton();
+        });
+
+        // Celebrate YES decision
+        btnYes.addEventListener('click', () => {
+            triggerYesCelebration();
+        });
+
+        function triggerYesCelebration() {
+            // Music box celebratory scale
+            audioController.playPluck(261.63, 0);     // C4
+            audioController.playPluck(329.63, 0.08);  // E4
+            audioController.playPluck(392.00, 0.16);  // G4
+            audioController.playPluck(523.25, 0.24);  // C5
+            audioController.playPluck(659.25, 0.32);  // E5
+            audioController.playPluck(783.99, 0.40);  // G5
+            audioController.playPluck(1046.50, 0.48); // C6
+
+            // Spawn emoji confetti rain
+            const emojis = ['🧠', '🍿', '💡', '🧸', '✨', '🎈'];
+            for (let i = 0; i < 40; i++) {
+                setTimeout(() => {
+                    const el = document.createElement('div');
+                    el.className = 'absolute text-4xl select-none pointer-events-none transition-all duration-1000';
+                    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    el.style.left = '50%';
+                    el.style.top = '50%';
+                    el.style.zIndex = '99999';
+                    document.body.appendChild(el);
+
+                    // Explode outward coordinates
+                    const angle = Math.random() * Math.PI * 2;
+                    const radius = 100 + Math.random() * 400;
+                    const destX = Math.cos(angle) * radius;
+                    const destY = Math.sin(angle) * radius;
+
+                    el.style.transform = `translate(calc(-50% + ${destX}px), calc(-50% + ${destY}px)) scale(${1.0 + Math.random()})`;
+                    el.style.opacity = '0';
+
+                    setTimeout(() => el.remove(), 1000);
+                }, i * 15);
+            }
+
+            // Reveal Certificate of Dumbness
+            setTimeout(() => {
+                dumbModal.classList.remove('opacity-100');
+                dumbModal.classList.add('opacity-0');
+                setTimeout(() => dumbModal.classList.add('hidden'), 300);
+
+                certModal.classList.remove('hidden');
+                setTimeout(() => {
+                    certModal.classList.add('opacity-100');
+                    certModal.classList.remove('opacity-0');
+                }, 10);
+            }, 600);
+        }
+
+        // Return from certificate mode back to start
+        btnCertAccept.addEventListener('click', () => {
+            certModal.classList.remove('opacity-100');
+            certModal.classList.add('opacity-0');
+            setTimeout(() => certModal.classList.add('hidden'), 500);
+
+            // Re-normalize No Button position cleanly without overlap
+            btnNo.style.position = '';
+            btnNo.style.left = '';
+            btnNo.style.top = '';
+
+            // Reset loop
+            currentChapter = 0;
+            updateNarrativeView();
+        });
+
+        window.onload = function() {
+            animate();
+        };
+    </script>
+</body>
+</html>
